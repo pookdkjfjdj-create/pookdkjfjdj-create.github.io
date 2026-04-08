@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionFril — Developer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #09090b;
+      --card: #18181b;
+      --card-hover: #27272a;
+      --border: rgba(255,255,255,0.06);
+      --text: #fafafa;
+      --text-dim: #71717a;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --accent3: #06b6d4;
+      --green: #22c55e;
+      --orange: #f59e0b;
+      --pink: #ec4899;
+      --radius: 16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* === ANIMATED BACKGROUND === */
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-glow .orb {
+      position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15;
+      animation: float 20s ease-in-out infinite;
+    }
+    .bg-glow .orb:nth-child(1) {
+      width: 600px; height: 600px; background: var(--accent);
+      top: -10%; left: -10%; animation-delay: 0s;
+    }
+    .bg-glow .orb:nth-child(2) {
+      width: 500px; height: 500px; background: var(--accent3);
+      top: 40%; right: -10%; animation-delay: -7s;
+    }
+    .bg-glow .orb:nth-child(3) {
+      width: 400px; height: 400px; background: var(--pink);
+      bottom: -5%; left: 30%; animation-delay: -14s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(60px, -40px) scale(1.1); }
+      66% { transform: translate(-30px, 50px) scale(0.95); }
+    }
+
+    /* === LAYOUT === */
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    /* === BENTO GRID === */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      background: var(--card-hover);
+      border-color: rgba(255,255,255,0.1);
+    }
+    .card::after {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: var(--radius);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: radial-gradient(400px circle at var(--mx, 50%) var(--my, 50%), rgba(99,102,241,0.08), transparent 70%);
+    }
+    .card:hover::after { opacity: 1; }
+
+    .span-2 { grid-column: span 2; }
+    .span-3 { grid-column: span 3; }
+    .row-2 { grid-row: span 2; }
+
+    /* === HERO CARD === */
+    .hero {
+      display: flex; flex-direction: column; justify-content: center;
+      min-height: 280px;
+    }
+    .hero .status {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--green);
+      margin-bottom: 12px;
+    }
+    .hero .status .dot {
+      width: 8px; height: 8px; background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+      50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+    }
+    .hero h1 {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1.15; margin-bottom: 8px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p { color: var(--text-dim); font-size: 0.95rem; max-width: 360px; }
+
+    .typed-cursor {
+      display: inline-block; width: 2px; height: 1em;
+      background: var(--accent); margin-left: 2px;
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* === SECTION LABELS === */
+    .card .label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    /* === SKILLS === */
+    .skills-grid { display: flex; flex-direction: column; gap: 12px; }
+    .skill-item { display: flex; align-items: center; gap: 10px; }
+    .skill-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; flex-shrink: 0;
+    }
+    .skill-info { flex: 1; }
+    .skill-name { font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .skill-bar {
+      height: 4px; background: rgba(255,255,255,0.08);
+      border-radius: 2px; overflow: hidden;
+    }
+    .skill-fill {
+      height: 100%; border-radius: 2px;
+      width: 0; transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* === PROJECTS === */
+    .projects-grid { display: flex; flex-direction: column; gap: 12px; }
+    .project {
+      padding: 14px; border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.2s ease, transform 0.2s ease;
+      cursor: default;
+    }
+    .project:hover {
+      background: rgba(255,255,255,0.04);
+      transform: translateX(4px);
+    }
+    .project-title {
+      font-size: 14px; font-weight: 600; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .project-tag {
+      font-size: 10px; padding: 2px 6px; border-radius: 4px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .project-desc { font-size: 13px; color: var(--text-dim); }
+
+    /* === TECH STACK PILLS === */
+    .tech-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pill {
+      padding: 6px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px; font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .pill:hover {
+      background: rgba(99,102,241,0.15);
+      border-color: rgba(99,102,241,0.3);
+      color: var(--accent);
+    }
+
+    /* === STATS === */
+    .stats { display: flex; flex-direction: column; gap: 16px; }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+    /* === BLOG === */
+    .blog-posts { display: flex; flex-direction: column; gap: 12px; }
+    .blog-post {
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .blog-post:last-child { border-bottom: none; }
+    .blog-date { font-size: 11px; color: var(--text-dim); }
+    .blog-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .blog-excerpt { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+
+    /* === CONTACT === */
+    .contact-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .contact-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px; font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .contact-btn:hover {
+      background: rgba(99,102,241,0.15);
+      border-color: rgba(99,102,241,0.3);
+      transform: translateY(-1px);
+    }
+    .contact-btn .icon { font-size: 18px; }
+
+    /* === EXPERIENCE TIMELINE === */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .timeline-item {
+      padding: 12px 0 12px 16px;
+      border-left: 2px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .timeline-item:last-child { border-left-color: transparent; }
+    .timeline-item::before {
+      content: '';
+      position: absolute; left: -5px; top: 18px;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+    }
+    .timeline-date { font-size: 11px; color: var(--text-dim); }
+    .timeline-title { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .timeline-desc { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+
+    /* === SCROLL ANIMATIONS === */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1; transform: translateY(0);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .bento { grid-template-columns: 1fr 1fr; }
+      .span-2, .span-3 { grid-column: span 2; }
+      .hero h1 { font-size: 1.6rem; }
+    }
+    @media (max-width: 480px) {
+      .bento { grid-template-columns: 1fr; }
+      .span-2, .span-3 { grid-column: span 1; }
+      .hero { min-height: 220px; }
+      .hero h1 { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+  </div>
+
+  <div class="wrapper">
+    <div class="bento">
+
+      <!-- HERO -->
+      <div class="card span-2 hero reveal">
+        <div class="status"><span class="dot"></span> Доступен к работе</div>
+        <h1>VisionFril<span class="typed-cursor"></span><br>
+          <span class="gradient" id="typed"></span>
+        </h1>
+        <p>Разрабатываю с AI. Python, C#, веб-интеграции. Превращаю идеи в работающие продукты.</p>
+      </div>
+
+      <!-- STATUS -->
+      <div class="card reveal">
+        <div class="label">Стек</div>
+        <div class="tech-pills">
+          <span class="pill">Python</span>
+          <span class="pill">C#</span>
+          <span class="pill">FastAPI</span>
+          <span class="pill">AI/ML</span>
+          <span class="pill">HTML/CSS</span>
+          <span class="pill">JavaScript</span>
+          <span class="pill">PHP</span>
+          <span class="pill">Telegram API</span>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="card row-2 reveal">
+        <div class="label">Навыки</div>
+        <div class="skills-grid">
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">Py</div>
+            <div class="skill-info">
+              <div class="skill-name">Python</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#3b82f6;" data-width="75%"></div></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(139,92,246,0.15);color:#8b5cf6;">C#</div>
+            <div class="skill-info">
+              <div class="skill-name">C#</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#8b5cf6;" data-width="70%"></div></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">AI</div>
+            <div class="skill-info">
+              <div class="skill-name">AI Integration</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#22c55e;" data-width="65%"></div></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">Web</div>
+            <div class="skill-info">
+              <div class="skill-name">Web (HTML/CSS/JS)</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#f59e0b;" data-width="45%"></div></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(236,72,153,0.15);color:#ec4899;">FA</div>
+            <div class="skill-info">
+              <div class="skill-name">FastAPI</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#ec4899;" data-width="60%"></div></div>
+            </div>
+          </div>
+          <div class="skill-item">
+            <div class="skill-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4;">TG</div>
+            <div class="skill-info">
+              <div class="skill-name">Telegram WebApp</div>
+              <div class="skill-bar"><div class="skill-fill" style="background:#06b6d4;" data-width="55%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="card reveal">
+        <div class="label">В цифрах</div>
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-num" data-target="2">0</div>
+            <div class="stat-label">Года в разработке</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" data-target="6">0</div>
+            <div class="stat-label">Языков / технологий</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num" data-target="5">0</div>
+            <div class="stat-label">Проектов завершено</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS -->
+      <div class="card span-2 reveal">
+        <div class="label">Проекты</div>
+        <div class="projects-grid">
+          <div class="project">
+            <div class="project-title">
+              AI Agent Desktop
+              <span class="project-tag" style="background:rgba(99,102,241,0.15);color:var(--accent);">AI</span>
+            </div>
+            <div class="project-desc">Приложение с AI-агентами. Многопровайдерная архитектура, RAG, инструменты для работы с файлами, shell, веб.</div>
+          </div>
+          <div class="project">
+            <div class="project-title">
+              Telegram WebApp
+              <span class="project-tag" style="background:rgba(6,182,212,0.15);color:var(--accent3);">Web</span>
+            </div>
+            <div class="project-desc">Web-приложение внутри Telegram с интеграцией AI-функционала.</div>
+          </div>
+          <div class="project">
+            <div class="project-title">
+              Server AI Assistant
+              <span class="project-tag" style="background:rgba(34,197,94,0.15);color:var(--green);">Ops</span>
+            </div>
+            <div class="project-desc">AI-помощник для работы на сервере — автоматизация рутинных задач.</div>
+          </div>
+          <div class="project">
+            <div class="project-title">
+              Automation Scripts
+              <span class="project-tag" style="background:rgba(245,158,11,0.15);color:var(--orange);">Tools</span>
+            </div>
+            <div class="project-desc">Скрипты для упрощения повседневных задач — от парсинга до автоматизации.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPERIENCE -->
+      <div class="card reveal">
+        <div class="label">Опыт</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-date">2025 — настоящее</div>
+            <div class="timeline-title">AI-интеграции</div>
+            <div class="timeline-desc">Разработка AI-агентов, RAG-систем, интеграция LLM в проекты</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2025</div>
+            <div class="timeline-title">Python + FastAPI</div>
+            <div class="timeline-desc">Бэкенд-разработка, API, боты</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2024</div>
+            <div class="timeline-title">C# разработка</div>
+            <div class="timeline-desc">Начало пути в программировании</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="card span-2 reveal">
+        <div class="label">Блог</div>
+        <div class="blog-posts">
+          <div class="blog-post">
+            <div class="blog-date">Скоро</div>
+            <div class="blog-title">Как я интегрировал AI в серверный помощник</div>
+            <div class="blog-excerpt">История создания AI-ассистента для работы с сервером — от идеи до реализации.</div>
+          </div>
+          <div class="blog-post">
+            <div class="blog-date">Скоро</div>
+            <div class="blog-title">Telegram WebApp: подводные камни</div>
+            <div class="blog-excerpt">Что нужно знать при разработке WebApp для Telegram.</div>
+          </div>
+          <div class="blog-post">
+            <div class="blog-date">Скоро</div>
+            <div class="blog-title">Мой путь: от C# к AI-агентам</div>
+            <div class="blog-excerpt">Как я начал с C# и дошёл до разработки мульти-провайдерных AI систем.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTACT -->
+      <div class="card reveal">
+        <div class="label">Связаться</div>
+        <div class="contact-links" style="flex-direction:column;">
+          <a href="https://t.me/VisionFril" target="_blank" class="contact-btn">
+            <span class="icon">✈️</span> @VisionFril
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /bento -->
+  </div><!-- /wrapper -->
+
+  <script>
+    // === SCROLL REVEAL ===
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 80);
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // === TYPED TEXT ===
+    const phrases = [
+      'Python & AI Developer',
+      'C# Developer',
+      'AI Integration Engineer',
+      'Full-Stack Enthusiast',
+    ];
+    let pi = 0, ci = 0, deleting = false;
+    const typedEl = document.getElementById('typed');
+
+    function type() {
+      const phrase = phrases[pi];
+      typedEl.textContent = phrase.substring(0, ci);
+
+      if (!deleting) {
+        ci++;
+        if (ci > phrase.length) {
+          setTimeout(() => { deleting = true; type(); }, 2000);
+          return;
+        }
+      } else {
+        ci--;
+        if (ci < 0) {
+          deleting = false;
+          pi = (pi + 1) % phrases.length;
+        }
+      }
+      setTimeout(type, deleting ? 30 : 60);
+    }
+    setTimeout(type, 500);
+
+    // === SKILL BAR ANIMATION ===
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.skill-fill').forEach(bar => {
+            bar.style.width = bar.dataset.width;
+          });
+          barObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('.skills-grid').forEach(el => barObserver.observe(el));
+
+    // === COUNTER ANIMATION ===
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.stat-num').forEach(num => {
+            const target = +num.dataset.target;
+            let current = 0;
+            const step = () => {
+              current++;
+              num.textContent = current;
+              if (current < target) setTimeout(step, 200);
+            };
+            step();
+          });
+          counterObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.stats').forEach(el => counterObserver.observe(el));
+
+    // === CARD MOUSE GLOW ===
+    document.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      });
+    });
+  </script>
+</body>
+</html>
